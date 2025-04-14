@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="FlashSoft">
+  <title>Kwai图片小助手</title>
+</head>
+
+<body>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    * {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+    }
+
+    body {
+      background: #00b69b;
+
+    }
+
+    h2 {
+      color: #006363;
+      margin: 4px 4px 4px 10px;
+      box-sizing: border-box;
+      font-size: 20px;
+      background: #006388;
+      padding: 10px;
+      color: #fff;
+    }
+
+    h5 {
+      color: #006363;
+      margin: 4px 4px 4px 10px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .title {
+      width: 100%;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 10px;
+    }
+
+    .item {
+      position: relative;
+      margin: 10px;
+      box-sizing: border-box;
+    }
+
+    .item aside {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      font-style: normal;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      padding: 2px 4px;
+      box-sizing: border-box;
+      transform: scale(0.7);
+      transform-origin: 0% 100%;
+    }
+
+    .item em {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      font-style: normal;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      padding: 2px 4px;
+      box-sizing: border-box;
+      transform: scale(0.7);
+      transform-origin: 100% 100%;
+    }
+
+    .item .tip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      white-space: nowrap;
+      z-index: 1024;
+      border: 0;
+      outline: none;
+      padding: 4px;
+    }
+
+    .item:hover .tip {
+      display: block;
+    }
+
+    .item img {
+      max-width: 400px;
+      max-height: 400px;
+      min-width: 150px;
+      vertical-align: bottom;
+      border: 1px solid #006363;
+      box-sizing: border-box;
+    }
+  </style>
+  <script type="module">
+    var data = {}
+    // console.log(data)
+    import { createApp } from 'https://unpkg.com/petite-vue?module'
+    createApp({
+      data,
+      focus(evt) {
+        const gs = document.getSelection()
+        gs.removeAllRanges()
+        const cr = document.createRange()
+        cr.selectNodeContents(evt.target)
+        gs.addRange(cr)
+      },
+      relativePath(src) {
+        return src.replace(data.path, '')
+      },
+      opaqueTotalSize() {
+        let size = 0
+        data.opaque_list.map(item => {
+          size += item.info.size
+        })
+        return `${parseInt(size / 1024, 10)}K`
+      },
+      totalSize() {
+        let size = 0
+        const list = Object.keys(data.similar_list).map(key => {
+          const item = data.similar_list[key]
+          item.list.map(child => size += child.info.size)
+          size += item.info.size
+        })
+        return `${parseInt(size / 1024, 10)}K`
+      }
+    }).mount()
+  </script>
+
+  <div v-scope>
+    <h2>已压缩图片</h2>
+    <div class="container">
+      <span class="item" v-for="(child, index) in data.compress_list" :key="index">
+        <img :src="`${relativePath(child.file)}`">
+        <div class="tip" @focus="focus" contenteditable>{{child.file}}</div>
+        <aside>{{child.type.toUpperCase()}}
+          <span v-if="child.type=='jpg'">quality: {{child.quality}}</span>
+          <span v-if="child.type=='png'">colors: {{child.plet_length}}</span>
+        </aside>
+        <em v-if="child.type=='jpg'">{{child.width}}ｘ{{child.height}} {{parseInt(child.size /
+          1024,10)}}K </em>
+        <em v-if="child.type=='png'">{{child.width}}ｘ{{child.height}} {{parseInt(child.size /
+          1024,10)}}K</em>
+      </span>
+    </div>
+    <h2>非透明PNG图片</h2>
+    <h5>总大小: {{opaqueTotalSize()}}</h5>
+    <div class="container">
+      <span class="item" v-for="(child, index) in data.opaque_list" :key="index">
+        <img :src="`${relativePath(child.file)}`">
+        <div class="tip" @focus="focus" contenteditable>{{child.file}}</div>
+        <aside>{{child.type.toUpperCase()}}
+          <span v-if="child.type=='jpg'">quality: {{child.quality}}</span>
+          <span v-if="child.type=='png'">colors: {{child.plet_length}}</span>
+        </aside>
+        <em>{{child.width}}ｘ{{child.height}} {{parseInt(child.size /
+          1024,10)}}K</em>
+      </span>
+    </div>
+    <h2>相似图片</h2>
+    <h5>总大小: {{totalSize()}}</h5>
+    <div class="container" v-for="(item, index) in data.similar_list" :key="index">
+      <div class="title">hash: {{item.hash}}</div>
+      <span class="item">
+        <img :src="`${relativePath(item.file)}`">
+        <div class="tip" @focus="focus" contenteditable>{{item.file}}</div>
+        <aside>{{item.type.toUpperCase()}}
+          <span v-if="item.type=='jpg'">quality: {{item.quality}}</span>
+          <span v-if="item.type=='png'">colors: {{item.plet_length}}</span>
+        </aside>
+        <em>{{item.width}}ｘ{{item.height}} {{parseInt(item.size / 1024,10)}}K</em>
+      </span>
+      <span class="item" v-for="child in item.list" :key="child.file">
+        <img :src="`${relativePath(child.file)}`">
+        <div class="tip" @focus="focus" contenteditable>{{child.file}}</div>
+        <aside>{{item.type.toUpperCase()}} dist: {{child.dist}}
+          <span v-if="child.type=='jpg'">quality: {{child.quality}}</span>
+          <span v-if="child.type=='png'">colors: {{child.plet_length}}</span>
+        </aside>
+        <em>{{child.width}}ｘ{{child.height}} {{parseInt(child.size /
+          1024,10)}}K</em>
+      </span>
+    </div>
+  </div>
+</body>
+
+</html>
