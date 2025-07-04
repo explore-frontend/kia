@@ -51,7 +51,7 @@ async function uploadImage(data: Buffer) {
     const res = await axios({
         timeout: Math.max(10000, data.length / 10), // 设网速 10k/s
         method: 'post',
-        url: `https://${randomTiny()}/web/shrink`,
+        url: `https://${randomTiny()}/backend/opt/shrink`,
         data,
         headers: {
             'Cache-Control': 'no-cache',

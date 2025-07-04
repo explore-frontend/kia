@@ -1,6 +1,6 @@
 {
-  "name": "@explore/kia",
-  "version": "0.1.0-beta1",
+  "name": "@kwai-explore/kia",
+  "version": "0.1.0-beta3",
   "description": "快手图片小助手",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,8 +32,7 @@
     "typescript": "^4.9.3"
   },
   "scripts": {
-    "build": "rm -rf dist && rm -rf bin && tsc --project tsconfig.json",
-    "preinstall": "sh ./set-env.sh"
+    "build": "rm -rf dist && rm -rf bin && tsc --project tsconfig.json"
   },
   "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b"
 }
